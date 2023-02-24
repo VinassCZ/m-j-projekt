@@ -1,0 +1,44 @@
+import speech_recognition as sr
+import pyttsx3
+
+# vytvoření instance rozpoznávače řeči a nastavení jazyka na češtinu
+r = sr.Recognizer()
+r.energy_threshold = 300
+r.dynamic_energy_threshold = True
+r.pause_threshold = 0.5
+
+# vytvoření instance syntetizéru řeči a nastavení jazyka na češtinu
+engine = pyttsx3.init()
+
+voices = engine.getProperty('voices')
+for voice in voices:
+    if voice.name == 'ivona-sk Iveta 22kHz':
+        engine.setProperty('voice', voice.id)
+
+
+# definice funkce pro rozpoznání řeči
+def recognize_speech():
+    with sr.Microphone() as source:
+        print("Mluvte nyní...")
+        audio = r.listen(source)
+        try:
+            text = r.recognize_google(audio, language='cs-CZ')
+            return text
+        except sr.UnknownValueError:
+            print("Nerozumím, můžete to zopakovat?")
+        except sr.RequestError as e:
+            print("Chyba při komunikaci se službou Google Speech Recognition; {0}".format(e))
+
+# definice funkce pro syntézu řeči
+def speak(text):
+    engine.say(text)
+    engine.runAndWait()
+
+# hlavní program pro použití funkcí
+while True:
+    # rozpoznání řeči
+    text = recognize_speech()
+    print("Výsledek rozpoznání: ", text)
+
+    # syntéza řeči
+    speak(text)
